@@ -7,6 +7,11 @@ const firebaseConfig = {
     projectId: "music-185e6",
     storageBucket: "music-185e6.appspot.com",
     appId: "1:167454364843:web:51e3ad6149866b1c6353ee"
-}
+};
 
-export default firebase.initializeApp(firebaseConfig);
+firebase.initializeApp(firebaseConfig);
+
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+export { auth, db };
