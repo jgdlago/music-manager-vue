@@ -107,7 +107,8 @@
 </template>
 
 <script>
-import { auth } from '@/includes/firebase'
+import { mapActions } from "pinia";
+import useUserStore from "@/stores/user";
 
 export default {
   name: "RegisterForm",
@@ -133,27 +134,28 @@ export default {
     };
   },
   methods: {
+    ...mapActions(useUserStore, {
+      createUser: "register",
+    }),
     async register(values) {
       this.reg_show_alert = true;
       this.reg_in_submission = true;
       this.reg_alert_variant = "bg-blue-500";
       this.reg_alert_msg = "Please wait! Your account is being created.";
 
-      let userCred = null;
       try {
-        const userCred = await auth().createUserWithEmailAndPassword(
-            values.email, values.password
-        );
+        await this.createUser(values);
       } catch (error) {
         this.reg_in_submission = false;
         this.reg_alert_variant = "bg-red-500";
-        this.reg_alert_msg = "Erro inesperado, tente novamente.";
+        this.reg_alert_msg =
+          "An unexpected error occurred. Please try again later.";
         return;
       }
 
       this.reg_alert_variant = "bg-green-500";
       this.reg_alert_msg = "Success! Your account has been created.";
-      console.log(values);
+      window.location.reload();
     },
   },
 };
