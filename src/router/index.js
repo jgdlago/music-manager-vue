@@ -1,61 +1,69 @@
-import { createRouter, createWebHistory } from 'vue-router';
-import Home from '/src/views/Home.vue';
-import About from '/src/views/About.vue';
-import Manage from '/src/views/Manage.vue';
-import store from '/src/store/index.js';
+import { createRouter, createWebHistory } from "vue-router";
+import Home from "@/views/Home.vue";
+import About from "@/views/About.vue";
+import Manage from "@/views/Manage.vue";
+import useUserStore from "@/stores/user";
+import Song from "@/views/Song.vue";
 
 const routes = [
   {
-    name: 'home',
-    path: '/', // example.com/
+    name: "home",
+    path: "/",
     component: Home,
   },
   {
-    name: 'about',
-    path: '/about',
+    name: "about",
+    path: "/about",
     component: About,
   },
   {
-    name: 'manage',
-    // alias: '/manage',
-    path: '/manage-music',
+    name: "manage",
+    // alias: "/manage",
+    path: "/manage-music",
+    component: Manage,
+    beforeEnter(to, from, next) {
+      console.log("Manage Route Guard");
+      next();
+    },
     meta: {
       requiresAuth: true,
     },
-    component: Manage,
-    beforeEnter: (to, from, next) => {
-      console.log('Manage Route Guard');
-      next();
-    },
   },
   {
-    path: '/manage',
-    redirect: { name: 'manage' },
+    path: "/manage",
+    redirect: { name: "manage" },
   },
   {
-    path: '/:catchAll(.*)*',
-    redirect: { name: 'home' },
+    name: "song",
+    path: "/song/:id",
+    component: Song,
+  },
+  {
+    path: "/:catchAll(.*)*",
+    redirect: { name: "home" },
   },
 ];
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes,
-  linkExactActiveClass: 'text-yellow-500',
+  linkExactActiveClass: "text-yellow-500",
 });
 
 router.beforeEach((to, from, next) => {
-  // console.log(to.matched);
+  // console.log("Global Guard");
 
-  if (!to.matched.some((record) => record.meta.requiresAuth)) {
+  if (!to.meta.requiresAuth) {
     next();
     return;
   }
 
-  if (store.state.userLoggedIn) {
+  const store = useUserStore();
+
+  if (store.userLoggedIn) {
     next();
   } else {
-    next({ name: 'home' });
+    next({ name: "home" });
   }
 });
 
